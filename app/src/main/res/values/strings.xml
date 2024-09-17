@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">RPG Game</string>
+    <string name="attack">Attack</string>
+    <string name="defend">Defend</string>
+    <string name="heal">Heal</string>
+    <string name="hero_name">Hero Name</string>
+    <string name="hp_15">HP: 15</string>
+    <string name="enemy_name">Enemy Name</string>
+    <string name="action_dialogue">action_dialogue\n</string>
+</resources>
