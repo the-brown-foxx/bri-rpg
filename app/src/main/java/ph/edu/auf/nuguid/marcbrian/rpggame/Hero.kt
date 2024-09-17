@@ -5,27 +5,33 @@ import kotlin.random.Random
 import kotlin.random.nextInt
 
 class Hero(name: String, characterStats: CharacterStats) : Character(name, characterStats), CharacterInterface {
-
-    override fun attack(target: Character): AttackResult {
+    fun attack(target: Character): AttackResult {
         target.damageQueued = Random.nextInt(1..40)
-        println("$name Attacked ${target.name} for ${target.damageQueued}!")
         return AttackResult(target.damageQueued)
     }
 
-    override fun defend(): DefendResult {
+    fun defend(): DefenseResult {
         val supposedDefense = characterStats.def
         defenseQueued = supposedDefense
-        return DefendResult(supposedDefense)
+        return DefenseResult(supposedDefense)
     }
 
-    override fun heal(): HealResult {
+    fun heal(): HealResult {
         val amount = Random.nextInt(20)
         characterStats.hp += amount
         println("$name Healed $amount")
         return HealResult(amount)
     }
 
-    override fun receiveDamage(): DamageResult {
+    override fun makeMove(move: Move): MoveResult {
+        return when (move) {
+            is AttackMove -> attack(move.target)
+            DefenseMove -> defend()
+            HealMove -> heal()
+        }
+    }
+
+    override fun receiveDamage(): SuccessfulDefenseResult? {
         val supposedDamage = damageQueued - defenseQueued
         val limitedDamage = max(0, supposedDamage)
         damageQueued = limitedDamage
@@ -34,13 +40,14 @@ class Hero(name: String, characterStats: CharacterStats) : Character(name, chara
         val limitedHp = max(0, newHp)
         characterStats.hp = limitedHp
 
-        if (defenseQueued > 0){
-            println("$name successfully defended and took $limitedDamage damage!")
+        val result = when {
+            defenseQueued > 0 -> SuccessfulDefenseResult(limitedDamage)
+            else -> null
         }
 
         damageQueued = 0
         defenseQueued = 0
 
-        return DamageResult(limitedDamage)
+        return result
     }
 }
